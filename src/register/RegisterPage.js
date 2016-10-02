@@ -77,7 +77,7 @@ class RegisterPage extends Component {
 }
 
 RegisterPage.propTypes = {
-  router: PropTypes.shape,
+  router: PropTypes.object,
 };
 
 export default withRouter(RegisterPage);

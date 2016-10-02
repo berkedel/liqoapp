@@ -1,7 +1,8 @@
 import React, { Component, PropTypes } from 'react';
-import { StyleSheet, View, TouchableOpacity, Text } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Text, Alert } from 'react-native';
 import { FormLabel, FormInput, Button, Card } from 'react-native-elements';
 import { withRouter } from 'react-router';
+import { client } from '../util/client';
 
 const styles = StyleSheet.create({
   container: { flex: 1, marginTop: 20 },
@@ -29,6 +30,7 @@ class LoginPage extends Component {
 
           <FormLabel>Username</FormLabel>
           <FormInput
+            editable={!this.state.disabled}
             autoCorrect={false}
             autoCapitalize={'none'}
             returnKeyType={'next'}
@@ -37,17 +39,36 @@ class LoginPage extends Component {
 
           <FormLabel>Password</FormLabel>
           <FormInput
+            editable={!this.state.disabled}
             secureTextEntry
             returnKeyType={'done'}
             onChangeText={password => this.setState({ password })}
           />
 
           <Button
+            disabled={this.state.disabled}
             small
             backgroundColor={'#397af8'}
             title={'Login'}
             buttonStyle={{ marginTop: 20 }}
-            onPress={() => null}
+            onPress={() => {
+              this.setState({ disabled: true });
+              const { username, password } = this.state;
+              client.login({ username, password })
+                .then((res) => {
+                  this.setState({ disabled: false });
+
+                  if (res.status === 200) {
+                    // TODO
+                  } else {
+                    Alert.alert(
+                      'Error',
+                      res.data,
+                      [{ text: 'OK' }],
+                    );
+                  }
+                });
+            }}
           />
 
           <View
@@ -68,7 +89,7 @@ class LoginPage extends Component {
 }
 
 LoginPage.propTypes = {
-  router: PropTypes.shape,
+  router: PropTypes.object,
 };
 
 
