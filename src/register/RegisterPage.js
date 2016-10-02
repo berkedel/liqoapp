@@ -71,6 +71,8 @@ class RegisterPage extends Component {
                   'Password and retype password is not matched',
                   [{ text: 'OK' }],
                 );
+                this.setState({ disabled: false });
+                return;
               }
 
               client.signup({ username, password })

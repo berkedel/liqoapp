@@ -1,18 +1,24 @@
+import { AsyncStorage } from 'react-native';
 import _ from 'lodash';
+
+const TOKEN_KEY = '@Storage:token';
 
 export class Client {
 
   constructor() {
     this.API_BASE_URL = 'https://liqo.herokuapp.com/api';
-    this.sessionToken = null;
+    AsyncStorage.getItem(TOKEN_KEY)
+      .then((token) => {
+        this.sessionToken = token;
+      }).done();
   }
 
   initialize(token) {
-    if (!_.isNull(token) && _.isUndefined(token.sessionToken)) {
+    if (!_.isNull(token)) {
       throw new Error('TokenMissing');
     }
 
-    this.sessionToken = _.isNull(token) ? null : token.sessionToken.sessionToken;
+    this.sessionToken = _.isNull(token) ? null : token;
   }
 
   /**
@@ -35,7 +41,8 @@ export class Client {
     })
     .then((res) => {
       if (!_.isNull(res.headers.authorization)) {
-        this.sessionToken = res.headers.authorization;
+        this.sessionToken = _.replace(res.headers.authorization, 'Bearer ', '');
+        AsyncStorage.setItem(TOKEN_KEY, this.sessionToken);
       }
       return res;
     })
