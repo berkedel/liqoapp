@@ -83,7 +83,7 @@ class RegisterPage extends Component {
                     Alert.alert(
                       'Success',
                       'Account successfully created',
-                      [{ text: 'OK', onPress: () => router.push('/') }],
+                      [{ text: 'OK', onPress: () => router.replace('/') }],
                     );
                   } else {
                     Alert.alert(

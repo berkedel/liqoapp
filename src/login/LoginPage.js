@@ -19,6 +19,13 @@ class LoginPage extends Component {
     };
   }
 
+  componentWillMount() {
+    const { router } = this.props;
+    if (client.sessionToken !== null) {
+      router.replace('/mutabaah');
+    }
+  }
+
   render() {
     const { router } = this.props;
 
@@ -59,7 +66,7 @@ class LoginPage extends Component {
                   this.setState({ disabled: false });
 
                   if (res.status === 200) {
-                    // TODO
+                    router.replace('/mutabaah');
                   } else {
                     Alert.alert(
                       'Error',
