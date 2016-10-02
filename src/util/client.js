@@ -45,6 +45,29 @@ export class Client {
   }
 
   /**
+   * ### signup
+   *
+   * @param data object
+   *
+   * {username: "barton", password: "Passw0rd!"}
+   *
+   * @return
+   * if ok, 'Done'
+   * otherwise, erorr message
+   */
+  async signup(data) {
+    return await this.fetch({
+      method: 'POST',
+      url: '/users',
+      body: data,
+    })
+    .then(res => res)
+    .catch((error) => {
+      throw (error);
+    });
+  }
+
+  /**
    * ### fetch
    * A generic function that prepares the request
    *

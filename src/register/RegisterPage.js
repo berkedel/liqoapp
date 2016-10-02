@@ -1,7 +1,8 @@
 import React, { Component, PropTypes } from 'react';
-import { StyleSheet, View, TouchableOpacity, Text } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Text, Alert } from 'react-native';
 import { FormLabel, FormInput, Button, Card } from 'react-native-elements';
 import { withRouter } from 'react-router';
+import { client } from '../util/client';
 
 const styles = StyleSheet.create({
   container: { flex: 1, marginTop: 20 },
@@ -30,6 +31,7 @@ class RegisterPage extends Component {
 
           <FormLabel>Username</FormLabel>
           <FormInput
+            editable={!this.state.disabled}
             autoCorrect={false}
             autoCapitalize={'none'}
             returnKeyType={'next'}
@@ -38,6 +40,7 @@ class RegisterPage extends Component {
 
           <FormLabel>Password</FormLabel>
           <FormInput
+            editable={!this.state.disabled}
             secureTextEntry
             returnKeyType={'next'}
             onChangeText={password => this.setState({ password })}
@@ -45,6 +48,7 @@ class RegisterPage extends Component {
 
           <FormLabel>Retype Password</FormLabel>
           <FormInput
+            editable={!this.state.disabled}
             textInputRef={c => this.retypePassword = c}
             secureTextEntry
             returnKeyType={'done'}
@@ -52,11 +56,42 @@ class RegisterPage extends Component {
           />
 
           <Button
+            disabled={this.state.disabled}
             small
             backgroundColor={'#397af8'}
             title={'Register'}
             buttonStyle={{ marginTop: 20 }}
-            onPress={() => null}
+            onPress={() => {
+              this.setState({ disabled: true });
+              const { username, password, rePassword } = this.state;
+
+              if (password !== rePassword) {
+                Alert.alert(
+                  'Error',
+                  'Password and retype password is not matched',
+                  [{ text: 'OK' }],
+                );
+              }
+
+              client.signup({ username, password })
+                .then((res) => {
+                  this.setState({ disabled: false });
+
+                  if (res.status === 201) {
+                    Alert.alert(
+                      'Success',
+                      'Account successfully created',
+                      [{ text: 'OK', onPress: () => router.push('/') }],
+                    );
+                  } else {
+                    Alert.alert(
+                      'Error',
+                      res.data,
+                      [{ text: 'OK' }],
+                    );
+                  }
+                });
+            }}
           />
 
           <View
