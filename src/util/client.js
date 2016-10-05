@@ -1,24 +1,14 @@
-import { AsyncStorage } from 'react-native';
 import _ from 'lodash';
-
-const TOKEN_KEY = '@Storage:token';
+import { authToken } from './authToken';
 
 export class Client {
 
   constructor() {
     this.API_BASE_URL = 'https://liqo.herokuapp.com/api';
-    AsyncStorage.getItem(TOKEN_KEY)
+    authToken.getSessionToken()
       .then((token) => {
         this.sessionToken = token;
-      }).done();
-  }
-
-  initialize(token) {
-    if (!_.isNull(token)) {
-      throw new Error('TokenMissing');
-    }
-
-    this.sessionToken = _.isNull(token) ? null : token;
+      });
   }
 
   /**
@@ -41,8 +31,8 @@ export class Client {
     })
     .then((res) => {
       if (!_.isNull(res.headers.authorization)) {
-        this.sessionToken = _.replace(res.headers.authorization, 'Bearer ', '');
-        AsyncStorage.setItem(TOKEN_KEY, this.sessionToken);
+        const token = _.replace(res.headers.authorization, 'Bearer ', '');
+        authToken.storeSessionToken(token);
       }
       return res;
     })
@@ -75,6 +65,44 @@ export class Client {
   }
 
   /**
+   * ### getProfile
+   * Using the sessionToken, we'll get everything about
+   * the current user.
+   *
+   * @returns
+   *
+   * {"id":"xxxxxxxxx",
+   *  "name":"test",
+   *  "groups":["xxxxxxxx"],
+   *  "session":{
+   *   "issued_at":1475418089,
+   *   "expired_at":1475504489
+   *  }
+   * }
+   */
+  async getProfile() {
+    return await this.fetch({
+      method: 'GET',
+      url: '/user',
+    })
+      .then(res => res)
+      .catch((error) => {
+        throw (error);
+      });
+  }
+
+  async getIbadahList() {
+    return await this.fetch({
+      method: 'GET',
+      url: '/ibadahs',
+    })
+      .then(res => res)
+      .catch((error) => {
+        throw (error);
+      });
+  }
+
+  /**
    * ### fetch
    * A generic function that prepares the request
    *
@@ -97,14 +125,11 @@ export class Client {
       },
     };
 
-    if (this.sessionToken) {
+    if (!_.isNull(this.sessionToken)) {
       reqOpts.headers.Authorization = `Bearer ${this.sessionToken}`;
     }
 
-    if (opts.method === 'POST' || opts.method === 'PUT') {
-      // reqOpts.headers.Accept = 'application/json';
-      reqOpts.headers['Content-Type'] = 'application/json';
-    }
+    reqOpts.headers['Content-Type'] = 'application/json';
 
     if (opts.body) {
       reqOpts.body = JSON.stringify(opts.body);

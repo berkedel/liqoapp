@@ -3,6 +3,7 @@ import { StyleSheet, View, TouchableOpacity, Text, Alert } from 'react-native';
 import { FormLabel, FormInput, Button, Card } from 'react-native-elements';
 import { withRouter } from 'react-router';
 import { client } from '../util/client';
+import { authToken } from '../util/authToken';
 
 const styles = StyleSheet.create({
   container: { flex: 1, marginTop: 20 },
@@ -21,9 +22,12 @@ class LoginPage extends Component {
 
   componentWillMount() {
     const { router } = this.props;
-    if (client.sessionToken !== null) {
-      router.replace('/mutabaah');
-    }
+    authToken.getSessionToken()
+      .then((token) => {
+        if (token) {
+          router.replace('/mutabaah');
+        }
+      });
   }
 
   render() {
