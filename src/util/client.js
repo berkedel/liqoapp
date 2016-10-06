@@ -30,10 +30,9 @@ export class Client {
       body: data,
     })
     .then((res) => {
-      if (!_.isNull(res.headers.authorization)) {
-        const token = _.replace(res.headers.authorization, 'Bearer ', '');
-        authToken.storeSessionToken(token);
-      }
+      const token = _.replace(res.headers.authorization, 'Bearer ', '');
+      this.sessionToken = token;
+      authToken.storeSessionToken(token);
       return res;
     })
     .catch((error) => {

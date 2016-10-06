@@ -70,7 +70,12 @@ class LoginPage extends Component {
                   this.setState({ disabled: false });
 
                   if (res.status === 200) {
-                    router.replace('/mutabaah');
+                    authToken.getSessionToken()
+                      .then((token) => {
+                        if (token) {
+                          router.replace('/mutabaah');
+                        }
+                      });
                   } else {
                     Alert.alert(
                       'Error',
