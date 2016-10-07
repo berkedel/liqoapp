@@ -49,7 +49,7 @@ class MutabaahList extends Component {
 
     this.renderRow = this.renderRow.bind(this);
     this.onPressRow = this.onPressRow.bind(this);
-    const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => !_.isEqual(r1, r2) });
+    const ds = new ListView.DataSource({ rowHasChanged: () => true });
     this.state = {
       dataSource: ds.cloneWithRows(props.dataSource),
       selectedId: -1,
@@ -78,6 +78,7 @@ class MutabaahList extends Component {
         currentInput = 'yes';
       }
     }
+
     return (
       <TouchableOpacity
         onPress={() => this.onPressRow(d, rowId)}
