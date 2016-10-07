@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import moment from 'moment';
+import _ from 'lodash';
 
 const styles = StyleSheet.create({
   container: {
@@ -31,18 +32,36 @@ const styles = StyleSheet.create({
   },
 });
 
-const MutabaahCard = props => (
-  <View style={[styles.container, props.style]}>
-    <Text style={styles.title}>Wirid Quran</Text>
-    <Text style={styles.currentInput}>0 Lembar</Text>
-    <TouchableOpacity>
-      <Text style={styles.date}>{moment().format('D MMMM YYYY')}</Text>
-    </TouchableOpacity>
-  </View>
-);
+const MutabaahCard = ({ style, data, onPressDate }) => {
+  let title = '...';
+  if (!_.isNull(data)) {
+    title = _.startCase(data.name);
+  }
+
+  let currentInput = 'Pilih!';
+  if (!_.isNull(data)) {
+    if (data.type === 'yesno') {
+      currentInput = data.value ? 'Yes' : 'No';
+    } else {
+      currentInput = `${data.value} ${_.startCase(data.unit_name)}`;
+    }
+  }
+
+  return (
+    <View style={[styles.container, style]}>
+      <Text style={styles.title}>{title}</Text>
+      <Text style={styles.currentInput}>{currentInput}</Text>
+      <TouchableOpacity onPress={() => onPressDate}>
+        <Text style={styles.date}>{moment().format('D MMMM YYYY')}</Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
 
 MutabaahCard.propTypes = {
   style: View.propTypes.style,
+  data: PropTypes.object,
+  onPressDate: PropTypes.func,
 };
 
 export default MutabaahCard;

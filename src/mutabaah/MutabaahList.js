@@ -44,50 +44,51 @@ const styles = StyleSheet.create({
 });
 
 class MutabaahList extends Component {
-  static genRow(datas) {
-    return datas.map(d => Object.assign({}, d, { isSelected: false }));
-  }
-
   constructor(props) {
     super(props);
 
     this.renderRow = this.renderRow.bind(this);
     this.onPressRow = this.onPressRow.bind(this);
-    const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
+    const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => !_.isEqual(r1, r2) });
     this.state = {
-      ibadahs: props.dataSource,
       dataSource: ds.cloneWithRows(props.dataSource),
+      selectedId: -1,
     };
   }
 
   componentWillReceiveProps(nextProps) {
     this.setState({
-      ibadahs: nextProps.dataSource,
       dataSource: this.state.dataSource.cloneWithRows(nextProps.dataSource),
     });
   }
 
   onPressRow(d, rowId) {
-    const newData = [...this.state.ibadahs];
-    newData[rowId] = Object.assign({}, d, { isSelected: true });
     this.setState({
-      dataSource: this.state.dataSource.cloneWithRows(newData),
+      selectedId: rowId,
     });
     this.props.onPress(d, rowId);
   }
 
   renderRow(d, sectionId, rowId) {
+    let currentInput = d.value;
+    if (d.type === 'yesno') {
+      if (d.value === 0) {
+        currentInput = 'no';
+      } else {
+        currentInput = 'yes';
+      }
+    }
     return (
       <TouchableOpacity
         onPress={() => this.onPressRow(d, rowId)}
       >
-        <View style={d.isSelected ? styles.rowSelected : styles.row}>
+        <View style={this.state.selectedId === rowId ? styles.rowSelected : styles.row}>
           <Icon name={'cloud'} size={20} />
           <View style={styles.content}>
             <Text style={styles.title}>{_.startCase(d.name)}</Text>
             <Text style={styles.subtitle}>{_.startCase(d.target)}</Text>
           </View>
-          <Text style={styles.currentInput}>{d.type === 'fillnumber' ? 0 : 'no'}</Text>
+          <Text style={styles.currentInput}>{currentInput}</Text>
         </View>
       </TouchableOpacity>
     );
