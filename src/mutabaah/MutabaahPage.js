@@ -2,11 +2,13 @@ import React, { Component, PropTypes } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { withRouter } from 'react-router';
 import _ from 'lodash';
+import moment from 'moment';
 import { client } from '../util/client';
 import { authToken } from '../util/authToken';
 import MutabaahForm from './MutabaahForm';
 import MutabaahCard from './MutabaahCard';
 import MutabaahList from './MutabaahList';
+import MutabaahCalendar from './MutabaahCalendar';
 
 const styles = StyleSheet.create({
   container: {
@@ -34,12 +36,14 @@ class MutabaahPage extends Component {
 
     this.onLeftClick = this.onLeftClick.bind(this);
     this.onRightClick = this.onRightClick.bind(this);
+    this.onDateSelect = this.onDateSelect.bind(this);
 
     this.state = {
       profile: null,
       ibadahs: null,
       currentIbadah: null,
       fillType: '',
+      currentDate: moment().format('D MMMM YYYY'),
     };
   }
 
@@ -115,6 +119,12 @@ class MutabaahPage extends Component {
     }
   }
 
+  onDateSelect(date) {
+    this.setState({
+      currentDate: moment(date).format('D MMMM YYYY'),
+    });
+  }
+
   render() {
     let listView = <Text>Loading...</Text>;
     if (!_.isNull(this.state.ibadahs)) {
@@ -133,7 +143,8 @@ class MutabaahPage extends Component {
         <MutabaahCard
           data={this.state.currentIbadah}
           style={styles.cardContainer}
-          onPressDate={() => null}
+          onPressDate={() => this.calendar.open()}
+          dateLabel={this.state.currentDate}
         />
         <MutabaahForm
           type={this.state.fillType}
@@ -144,6 +155,10 @@ class MutabaahPage extends Component {
         <View style={styles.listContainer}>
           {listView}
         </View>
+        <MutabaahCalendar
+          ref={c => this.calendar = c}
+          onDateSelect={date => this.onDateSelect(date)}
+        />
       </View>
     );
   }

@@ -1,6 +1,5 @@
 import React, { PropTypes } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
-import moment from 'moment';
 import _ from 'lodash';
 
 const styles = StyleSheet.create({
@@ -32,7 +31,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const MutabaahCard = ({ style, data, onPressDate }) => {
+const MutabaahCard = ({ style, data, onPressDate, dateLabel }) => {
   let title = '...';
   if (!_.isNull(data)) {
     title = _.startCase(data.name);
@@ -51,8 +50,8 @@ const MutabaahCard = ({ style, data, onPressDate }) => {
     <View style={[styles.container, style]}>
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.currentInput}>{currentInput}</Text>
-      <TouchableOpacity onPress={() => onPressDate}>
-        <Text style={styles.date}>{moment().format('D MMMM YYYY')}</Text>
+      <TouchableOpacity onPress={onPressDate}>
+        <Text style={styles.date}>{dateLabel}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -62,6 +61,7 @@ MutabaahCard.propTypes = {
   style: View.propTypes.style,
   data: PropTypes.object,
   onPressDate: PropTypes.func,
+  dateLabel: PropTypes.string,
 };
 
 export default MutabaahCard;
