@@ -71,7 +71,7 @@ export class Client {
    * @returns
    *
    * {"id":"xxxxxxxxx",
-   *  "name":"test",
+   *  "username":"test",
    *  "groups":["xxxxxxxx"],
    *  "session":{
    *   "issued_at":1475418089,

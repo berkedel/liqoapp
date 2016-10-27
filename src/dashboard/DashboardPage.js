@@ -1,6 +1,10 @@
-import React from 'react';
+import React, { Component, PropTypes } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import { withRouter } from 'react-router';
+import _ from 'lodash';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { client } from '../util/client';
+import { authToken } from '../util/authToken';
 
 const styles = StyleSheet.create({
   container: {
@@ -53,118 +57,167 @@ const styles = StyleSheet.create({
   },
 });
 
-const DashboardPage = () => (
-  <View style={styles.container}>
-    <View style={styles.header}>
-      <View style={styles.headerProfile}>
-        <Icon name={'user'} size={20} color={'white'} />
-        <Text style={styles.headerProfileName}>Nama</Text>
-      </View>
-      <TouchableOpacity>
-        <Text style={styles.headerProfileLogout}>Logout</Text>
-      </TouchableOpacity>
-    </View>
+class DashboardPage extends Component {
+  constructor(props) {
+    super(props);
 
-    <View style={styles.subHeader}>
-      <Text style={styles.subHeaderTitle}>Default Group: LiqoCeria</Text>
-    </View>
+    this.state = {
+      profile: null,
+    };
+  }
 
-    <View style={styles.grid}>
-      <View style={styles.gridItem}>
-        <TouchableOpacity>
-          <Icon
-            style={styles.gridItemIcon}
-            name={'calendar-check-o'}
-            size={40}
-            color={'#000'}
-          />
-          <Text style={styles.gridItemLabel}>Mutabaah</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.gridItem}>
-        <TouchableOpacity>
-          <Icon
-            style={styles.gridItemIcon}
-            name={'group'}
-            size={40}
-            color={'#000'}
-          />
-          <Text style={styles.gridItemLabel}>Group</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.gridItem}>
-        <TouchableOpacity>
-          <Icon
-            style={styles.gridItemIcon}
-            name={'calendar'}
-            size={40}
-          />
-          <Text style={styles.gridItemLabel}>Calendar</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.gridItem}>
-        <TouchableOpacity>
-          <Icon
-            style={styles.gridItemIcon}
-            name={'envelope'}
-            size={40}
-          />
-          <Text style={styles.gridItemLabel}>Messages</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.gridItem}>
-        <TouchableOpacity>
-          <Icon
-            style={styles.gridItemIcon}
-            name={'search'}
-            size={40}
-            color={'#000'}
-          />
-          <Text style={styles.gridItemLabel}>Search</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.gridItem}>
-        <TouchableOpacity>
-          <Icon
-            style={styles.gridItemIcon}
-            name={'newspaper-o'}
-            size={40}
-          />
-          <Text style={styles.gridItemLabel}>News</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.gridItem}>
-        <TouchableOpacity>
-          <Icon
-            style={styles.gridItemIcon}
-            name={'question'}
-            size={40}
-          />
-          <Text style={styles.gridItemLabel}>Ask Help</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.gridItem}>
-        <TouchableOpacity>
-          <Icon
-            style={styles.gridItemIcon}
-            name={'commenting'}
-            size={40}
-          />
-          <Text style={styles.gridItemLabel}>Chat</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.gridItem}>
-        <TouchableOpacity>
-          <Icon
-            style={styles.gridItemIcon}
-            name={'cog'}
-            size={40}
-          />
-          <Text style={styles.gridItemLabel}>Settings</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  </View>
-);
+  componentWillMount() {
+    const { router } = this.props;
 
-export default DashboardPage;
+    client.getProfile()
+      .then((res) => {
+        if (res.status === 200) {
+          this.setState({ profile: res.data });
+        } else if (res.status === 401) {
+          authToken.deleteSessionToken();
+          router.push('/');
+        }
+      }).done();
+  }
+
+  onLogout() {
+    const { router } = this.props;
+
+    authToken.deleteSessionToken();
+    router.push('/');
+  }
+
+  onMutabaahClicked() {
+    const { router } = this.props;
+
+    router.push('/mutabaah');
+  }
+
+  render() {
+    const { profile } = this.state;
+    let username = 'loading...';
+    if (!_.isNull(profile)) {
+      username = profile.username;
+    }
+
+    return (
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <View style={styles.headerProfile}>
+            <Icon name={'user'} size={20} color={'white'} />
+            <Text style={styles.headerProfileName}>{username}</Text>
+          </View>
+          <TouchableOpacity onPress={() => this.onLogout()}>
+            <Text style={styles.headerProfileLogout}>Logout</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.subHeader}>
+          <Text style={styles.subHeaderTitle}>Default Group: LiqoCeria</Text>
+        </View>
+
+        <View style={styles.grid}>
+          <View style={styles.gridItem}>
+            <TouchableOpacity onPress={() => this.onMutabaahClicked()}>
+              <Icon
+                style={styles.gridItemIcon}
+                name={'calendar-check-o'}
+                size={40}
+                color={'#000'}
+              />
+              <Text style={styles.gridItemLabel}>Mutabaah</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.gridItem}>
+            <TouchableOpacity>
+              <Icon
+                style={styles.gridItemIcon}
+                name={'group'}
+                size={40}
+                color={'#000'}
+              />
+              <Text style={styles.gridItemLabel}>Group</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.gridItem}>
+            <TouchableOpacity>
+              <Icon
+                style={styles.gridItemIcon}
+                name={'calendar'}
+                size={40}
+              />
+              <Text style={styles.gridItemLabel}>Calendar</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.gridItem}>
+            <TouchableOpacity>
+              <Icon
+                style={styles.gridItemIcon}
+                name={'envelope'}
+                size={40}
+              />
+              <Text style={styles.gridItemLabel}>Messages</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.gridItem}>
+            <TouchableOpacity>
+              <Icon
+                style={styles.gridItemIcon}
+                name={'search'}
+                size={40}
+                color={'#000'}
+              />
+              <Text style={styles.gridItemLabel}>Search</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.gridItem}>
+            <TouchableOpacity>
+              <Icon
+                style={styles.gridItemIcon}
+                name={'newspaper-o'}
+                size={40}
+              />
+              <Text style={styles.gridItemLabel}>News</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.gridItem}>
+            <TouchableOpacity>
+              <Icon
+                style={styles.gridItemIcon}
+                name={'question'}
+                size={40}
+              />
+              <Text style={styles.gridItemLabel}>Ask Help</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.gridItem}>
+            <TouchableOpacity>
+              <Icon
+                style={styles.gridItemIcon}
+                name={'commenting'}
+                size={40}
+              />
+              <Text style={styles.gridItemLabel}>Chat</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.gridItem}>
+            <TouchableOpacity>
+              <Icon
+                style={styles.gridItemIcon}
+                name={'cog'}
+                size={40}
+              />
+              <Text style={styles.gridItemLabel}>Settings</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    );
+  }
+}
+
+DashboardPage.propTypes = {
+  router: PropTypes.object,
+};
+
+export default withRouter(DashboardPage);
