@@ -25,7 +25,7 @@ class LoginPage extends Component {
     authToken.getSessionToken()
       .then((token) => {
         if (token) {
-          router.replace('/mutabaah');
+          router.replace('/dashboard');
         }
       });
   }
