@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { StyleSheet, View, TouchableOpacity, Text, Alert } from 'react-native';
 import { FormLabel, FormInput, Button, Card } from 'react-native-elements';
+import * as Progress from 'react-native-progress';
 import { withRouter } from 'react-router';
 import { client } from '../util/client';
 import { authToken } from '../util/authToken';
@@ -17,6 +18,7 @@ class LoginPage extends Component {
     this.state = {
       username: '',
       password: '',
+      loading: true,
     };
   }
 
@@ -24,6 +26,8 @@ class LoginPage extends Component {
     const { router } = this.props;
     authToken.getSessionToken()
       .then((token) => {
+        this.setState({ loading: false });
+
         if (token) {
           router.replace('/dashboard');
         }
@@ -32,6 +36,17 @@ class LoginPage extends Component {
 
   render() {
     const { router } = this.props;
+    const { loading } = this.state;
+
+    if (loading) {
+      return (
+        <Progress.Circle
+          style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+          size={40}
+          indeterminate
+        />
+      );
+    }
 
     return (
       <View

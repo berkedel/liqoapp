@@ -90,6 +90,32 @@ export class Client {
       });
   }
 
+  async getGroupDetails(id) {
+    return await this.fetch({
+      method: 'GET',
+      url: `/groups/${id}`,
+    })
+      .then(res => res)
+      .catch((error) => {
+        throw (error);
+      });
+  }
+
+  /**
+   * ### getIbadahList
+   * Get all ibadahs
+   *
+   * @returns
+   *
+   * [
+   *  {"_id":"aaa","group_id":"111","name":"rrr","type":"hh","target":"yy","unit_name":"ww"},
+   *  {"_id":"bbb","group_id":"222","name":"sss","type":"hh","target":"yy","unit_name":"ww"},
+   *  {"_id":"ccc","group_id":"333","name":"ttt","type":"hh","target":"yy","unit_name":"ww"},
+   *  {"_id":"ddd","group_id":"444","name":"uuu","type":"ii","target":"xx"},
+   *  {"_id":"eee","group_id":"555","name":"vvv","type":"ii","target":"xx"},
+   *  {"_id":"fff","group_id":"666","name":"www","type":"ii","target":"xx"},
+   *  {"_id":"ggg","group_id":"777","name":"zzz","type":"ii","target":"xx"}]
+   */
   async getIbadahList() {
     return await this.fetch({
       method: 'GET',

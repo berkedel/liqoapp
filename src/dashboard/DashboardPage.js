@@ -63,20 +63,27 @@ class DashboardPage extends Component {
 
     this.state = {
       profile: null,
+      group: null,
     };
   }
 
   componentWillMount() {
-    const { router } = this.props;
-
     client.getProfile()
       .then((res) => {
         if (res.status === 200) {
           this.setState({ profile: res.data });
+
+          const groupId = res.data.groups[0];
+          client.getGroupDetails(groupId)
+            .then((rex) => {
+              if (rex.status === 200) {
+                this.setState({ group: rex.data });
+              }
+            }).done();
         } else if (res.status === 401) {
-          authToken.deleteSessionToken();
-          router.push('/');
+          this.onLogout();
         }
+        return res;
       }).done();
   }
 
@@ -84,17 +91,16 @@ class DashboardPage extends Component {
     const { router } = this.props;
 
     authToken.deleteSessionToken();
-    router.push('/');
+    router.replace('/');
   }
 
   onMutabaahClicked() {
     const { router } = this.props;
-
     router.push('/mutabaah');
   }
 
   render() {
-    const { profile } = this.state;
+    const { profile, group } = this.state;
     let username = 'loading...';
     if (!_.isNull(profile)) {
       username = profile.username;
@@ -113,7 +119,9 @@ class DashboardPage extends Component {
         </View>
 
         <View style={styles.subHeader}>
-          <Text style={styles.subHeaderTitle}>Default Group: LiqoCeria</Text>
+          <Text style={styles.subHeaderTitle}>
+            Default Group: {!_.isNull(group) && group.name}
+          </Text>
         </View>
 
         <View style={styles.grid}>
